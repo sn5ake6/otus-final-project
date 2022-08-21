@@ -1,0 +1,50 @@
+version: '3.7'
+
+services:
+  postgres:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - ${DB_PORT}:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - anti-brute-force-network
+
+  goose:
+    build:
+      context: ../.
+      dockerfile: build/goose/Dockerfile
+    command: ["./wait-for-it.sh", "postgres:5432", "--strict", "--timeout=60", "--", "goose", "--dir=/migrations", "postgres", "postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}?sslmode=disable", "up"]
+    volumes:
+      - ./../migrations:/migrations
+    depends_on:
+      - postgres
+    networks:
+      - anti-brute-force-network
+
+  anti-brute-force:
+    build:
+      context: ../
+      dockerfile: build/app/Dockerfile
+    command: ["./wait-for-it.sh", "postgres:5432", "--strict", "--timeout=60", "--", "/opt/anti-brute-force/app", "-config", "/etc/anti-brute-force/config.toml"]
+    volumes:
+      - ./../configs/config.toml:/etc/anti-brute-force/config.toml
+    ports:
+      - 8888:8888
+      - 50051:50051
+    depends_on:
+      - goose
+    networks:
+      - anti-brute-force-network
+
+volumes:
+  pgdata:
+    driver: local
+
+networks:
+  anti-brute-force-network:
+    driver: bridge

@@ -1,0 +1,20 @@
+[logger]
+level = "INFO"
+
+[storage]
+type = "sql"
+dsn = "postgres://anti-brute-force:anti-brute-force@postgres:5432/anti-brute-force?sslmode=disable"
+
+[HTTPServer]
+host = "0.0.0.0"
+port = "8888"
+
+[GRPCServer]
+host = "0.0.0.0"
+port = "50051"
+
+[limit]
+login = 10
+password = 100
+ip = 1000
+resetInterval = "1m"

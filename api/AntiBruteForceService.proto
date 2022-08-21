@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package event;
+
+option go_package = "./;pb";
+
+service AntiBruteForceService {
+    rpc Authorize(AuthorizeRequest) returns (AuthorizeResponse) {}
+    rpc Reset(ResetRequest) returns (ResultResponse) {}
+    rpc AddToBlacklist(BlacklistRequest) returns (ResultResponse) {}
+    rpc DeleteFromBlacklist(BlacklistRequest) returns (ResultResponse) {}
+    rpc AddToWhitelist(WhitelistRequest) returns (ResultResponse) {}
+    rpc DeleteFromWhitelist(WhitelistRequest) returns (ResultResponse) {}
+}
+
+message AuthorizeRequest {
+    string login = 1;
+    string password = 2;
+    string ip = 3;
+}
+
+message AuthorizeResponse {
+    bool result = 1;
+}
+
+message ResetRequest {
+    string login = 1;
+    string ip = 2;
+    string password = 3;
+}
+
+message BlacklistRequest {
+	string subnet = 1;
+}
+
+message WhitelistRequest {
+	string subnet = 1;
+}
+
+message ResultResponse {
+    string error = 1;
+}
