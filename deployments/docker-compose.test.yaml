@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  integration_tests:
+    build:
+      context: ../
+      dockerfile: build/test/Dockerfile
+    networks:
+      - anti-brute-force-network
+
+networks:
+  anti-brute-force-network:
+    driver: bridge
